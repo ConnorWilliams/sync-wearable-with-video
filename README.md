@@ -30,7 +30,8 @@ Information from the wearable accelerometer. Sometimes the subject is wearing 2 
 #### userXXX.txt
 Information about the user joints 3D position
 
-1. Corresponding number of frame (the same index that is used for the image name) and the following four columns are the information of the joints the first one is the confidence of the joint tracker (0 if the joint is interpolated) and the other are the joints 3D position XYZ. The order of the joints in each rows is:
+1. Corresponding number of frame (the same index that is used for the image name)
+* The following columns are in sets of 4 and contain the information of the joints. The first one is the confidence of the joint tracker (0 if the joint is interpolated) and the other three are the joints 3D position XYZ. The order of the joints in each rows is:
     * JOINT_HEAD
     * JOINT_NECK
     * JOINT_LEFT_SHOULDER
