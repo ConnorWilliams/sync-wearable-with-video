@@ -17,7 +17,10 @@ During the recording you will have one (or more if the recording is very long) l
     * I (Massimo Camplani) encoded on a unique integer, as we are using matlab and we need to have an ascii file with only numbers (not chars). For example 11924379 --> 1(hour).19(minutes).24(second).379(ms) . Anyway, you really don't need to parse the other elements since you can obtain them summing the sixth column.
 
 #### ACC_XXX.txt
-Information from the wearable accelerometer. Sometimes the subject is wearing 2 accelerometers which results in ACC_XXX*.txt and ACC_1XXX.txt
+Information from the wearable accelerometer. The subject wears 2 accelerometers:
+* On the right hand - ACC_0XXX*.txt
+* On the torso/ trunk - ACC_1XXX.txt
+
 
 1. Read #
 2. Difference in ms between the current timestamp vs previous.
@@ -32,7 +35,7 @@ Information about the user joints 3D position
 
 1. Corresponding number of frame (the same index that is used for the image name)
 * The following columns are in sets of 4 and contain the information of the joints. The first one is the confidence of the joint tracker (0 if the joint is interpolated) and the other three are the joints 3D position XYZ. The order of the joints in each rows is:
-    * JOINT_HEAD
+    1. JOINT_HEAD
     * JOINT_NECK
     * JOINT_LEFT_SHOULDER
     * JOINT_RIGHT_SHOULDER
