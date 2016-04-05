@@ -1,0 +1,14 @@
+Cross correlation between -1 and 1
+
+What temporal distortions am I considering?
+    * No distortion
+    * One clock runs slower than the other
+    * Jumps
+    * Sudden resynchronizations
+
+What is the problem
+Temporal distortions
+Data Generator and why i've added certain features
+Methods for fixing synthetic data - what works and what doesnt
+
+DTW Paper - how an time be warped?

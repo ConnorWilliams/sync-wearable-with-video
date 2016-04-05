@@ -1,0 +1,54 @@
+\chapter{Contextual Background}
+\label{chap:context}
+% A compulsory chapter, of roughly 5 pages
+%
+% Describe the project context, and motivate each aim and objective.
+% Fairly high-level, and easily understood by a reader who is technically
+% competent but not an expert in the topic itself.
+%
+% Answer three questions for the reader:
+%     * What is the project topic, or problem being investigated?
+%     * Why is the topic important, or why should the reader care about it?
+%         For example, why there is a need for this project (e.g., lack of similar
+%         software or deficiency in existing software), who will benefit from the
+%         project and in what way (e.g., end-users, or software developers) what
+%         work does the project build on and why is the selected approach either
+%         important and/or interesting (e.g., fills a gap in literature, applies
+%         results from another field to a new problem).
+%     * What are the central challenges involved and why are they significant?
+%
+% This chapter should conclude with a concise bullet point list that
+% summarises the aims and objectives.  For example:
+%
+%     The high-level objective of this project is to reduce the performance
+%     gap between hardware and software implementations of modular arithmetic.
+%     More specifically, the concrete aims are:
+%
+%     * Research and survey literature on public-key cryptography and
+%           identify the state of the art in exponentiation algorithms.
+%     * Improve the state of the art algorithm so that it can be used
+%           in an effective and flexible way on constrained devices.
+%     * Implement a framework for describing exponentiation algorithms
+%           and populate it with suitable examples from the literature on
+%           an ARM7 platform.
+%     * Use the framework to perform a study of algorithm performance
+%           in terms of time and space, and show the proposed improvements
+%           are worthwhile.
+
+This project could be broken down in the following steps:
+\begin{enumerate}
+    \item Consider different types of temporal distortions which could take place
+        on a device such as this one.
+    \item Implement a program which generates data and can apply any combination
+        of the different types of temporal distortion.
+    \item Devise a method to compensate for the different temporal distortions.
+    \item Given a synchronised set of data from the accelerometer and the
+        cameras, introduce artificial drifts between data sets and assess how well
+        the methods work.
+    \item Apply this method to real drifted data which has already been
+        collected in the SPHERE house in three locations; hallway, living room and kitchen.
+\end{enumerate}
+
+Implicit to all of these steps will is a fair amount of data formatting and
+visualisation. I use Python for the implementation with SciPy which
+is an open source library of scientific tools for Python.

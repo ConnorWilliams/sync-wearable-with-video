@@ -1,0 +1,12 @@
+\contentsline {chapter}{Abstract}{v}{chapter*.3}
+\contentsline {chapter}{Notation and Acronyms}{ix}{chapter*.5}
+\contentsline {chapter}{\numberline {1}Contextual Background}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}Technical Background}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Initial solution ideas}{3}{section.2.1}
+\contentsline {chapter}{\numberline {3}Project Execution}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}Data Generator}{5}{section.3.1}
+\contentsline {section}{\numberline {3.2}Methods}{5}{section.3.2}
+\contentsline {chapter}{\numberline {4}Critical Evaluation}{7}{chapter.4}
+\contentsline {section}{\numberline {4.1}SPHERE Data Tests}{7}{section.4.1}
+\contentsline {section}{\numberline {4.2}Results}{7}{section.4.2}
+\contentsline {chapter}{\numberline {5}Conclusion}{9}{chapter.5}

@@ -1,0 +1,84 @@
+% The document class supplies options to control rendering of some standard
+% features in the result.  The goal is for uniform style, so some attention
+% to detail is *vital* with all fields.  Each field (i.e., text inside the
+% curly braces below, so the MEng text inside {MEng} for instance) should
+% take into account the following:
+%
+% - author name       should be formatted as "FirstName LastName"
+%   (not "Initial LastName" for example),
+% - supervisor name   should be formatted as "Title FirstName LastName"
+%   (where Title is "Dr." or "Prof." for example),
+% - degree programme  should be "BSc", "MEng", "MSci", "MSc" or "PhD",
+% - dissertation title should be correctly capitalised (plus you can have
+%   an optional sub-title if appropriate, or leave this field blank),
+% - dissertation type should be formatted as one of the following:
+%   * for the MEng degree programme either "enterprise" or "research" to
+%     reflect the stream,
+%   * for the MSc  degree programme "$X/Y/Z$" for a project deemed to be
+%     X%, Y% and Z% of type I, II and III.
+% - year              should be formatted as a 4-digit year of submission
+%   (so 2014 rather than the accademic year, say 2013/14 say).
+
+\documentclass[ % the name of the author
+                    author={Connor Williams},
+                % the name of the supervisor
+                    supervisor={Prof. Peter Flach},
+                % the degree programme
+                    degree={BSc},
+                % the dissertation    title (which cannot be blank)
+                     title={Automatically Correcting for a Time Drift in Accelerometers using RGBD Cameras},
+                % the dissertation subtitle (which can be blank)
+                    subtitle={},
+                % the dissertation type
+                      type={},
+                % the year of submission
+                      year={2016} ]{dissertation}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
+\begin{document}
+
+% =============================================================================
+\maketitle
+\frontmatter
+\makedecl
+
+\tableofcontents
+% \listoffigures
+% \listoftables
+% \listofalgorithms
+% \lstlistoflistings
+
+\input{abstract}
+
+\input{supporting_technologies}
+
+\input{notation_and_acronyms}
+
+\input{acknowledgements}
+
+% =============================================================================
+\mainmatter
+
+\input{contextual_background}
+
+\input{technical_background}
+
+\input{project_execution}
+
+\input{critical_evaluation}
+
+\input{conclusion}
+
+% =============================================================================
+\backmatter
+
+\bibliography{dissertation}
+
+% \appendix
+% \input{example_appendix}
+
+% =============================================================================
+
+\end{document}

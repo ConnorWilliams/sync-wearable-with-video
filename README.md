@@ -17,7 +17,7 @@ During the recording you will have one (or more if the recording is very long) l
     * I (Massimo Camplani) encoded on a unique integer, as we are using matlab and we need to have an ascii file with only numbers (not chars). For example 11924379 --> 1(hour).19(minutes).24(second).379(ms) . Anyway, you really don't need to parse the other elements since you can obtain them summing the sixth column.
 
 #### ACC_XXX.txt
-Information from the wearable accelerometer. The subject wears 2 accelerometers:
+Information from the wearable accelerometer. The subject wears 2 accelerometers **which sample at 50Hz**:
 * On the right hand - ACC_0XXX*.txt
 * On the torso/ trunk - ACC_1XXX.txt
 
@@ -31,7 +31,7 @@ Information from the wearable accelerometer. The subject wears 2 accelerometers:
 7. Internal time stamp of the accelerometer device.
 
 #### userXXX.txt
-Information about the user joints 3D position
+Information about the user joints 3D position. **Video cameras sample at 30Hz.**
 
 1. Corresponding number of frame (the same index that is used for the image name)
 * The following columns are in sets of 4 and contain the information of the joints. The first one is the confidence of the joint tracker (0 if the joint is interpolated) and the other three are the joints 3D position XYZ. The order of the joints in each rows is:
