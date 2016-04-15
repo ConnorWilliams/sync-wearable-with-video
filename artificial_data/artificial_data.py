@@ -3,19 +3,22 @@ import numpy as np
 import fxn_library as f
 
 start_time = 0
-end_time = 50
+end_time = 60
+sampling_rate = 50
 
-x_pos, acceleration = f.generateData(False, end_time, 1, 0.5, 50)
+x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
-acceleration = f.addDrift(acceleration, 0.001, start_time, end_time)
+acceleration = f.addDrift(acceleration, 1.05, sampling_rate)
+
+# acceleration = f.addShift(acceleration, 0.5)
 
 cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
 
 _, plotnum = plt.subplots(3, sharex=True)
 
-winSize = 1
-stepSize = 0.5
+winSize = 3
+stepSize = 1
 drift = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plotnum[1])
 
 new_times = acceleration[:,0] - (acceleration[:,0]*drift)

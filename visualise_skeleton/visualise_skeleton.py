@@ -3,7 +3,7 @@ import skeleton_vis_fxns as f
 import numpy as np
 
 #---- VARIABLES (Change) ----#
-time_interval = 2000 #(ms)
+time_interval = 10000 #(ms)
 size_of_kernel = 15
 
 #---- DEFINITIONS (Do not change)----#
@@ -12,7 +12,7 @@ maxTime=0
 minTime=0
 ts_info_filename = directory + '/frameTSinfo0.000000.txt'
 ts_info_names = ("imName", "idxColour", "tsColour", "idxDepth", "tsDepth", "diff", "tsRecDvc")
-video_filename = directory + '/user1.txt'
+video_filename = directory + '/user0.txt'
 video_names = ()
 
 
@@ -48,5 +48,6 @@ for the_file in os.listdir(folder):
     except Exception, e:
         print e
 
+print "Visualising skeleton from %i for %i seconds." %(start_time, time_interval/1000)
 f.makeImage(skeleton)
 print "\nView images by running eog out/*"
