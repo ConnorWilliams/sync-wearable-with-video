@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import interpolate
 from scipy import signal
+from scipy import array
 import matplotlib.pyplot as plt
 import sys
 from matplotlib.collections import LineCollection
@@ -40,9 +41,10 @@ def addDrift(signal, mult, sampling_rate):
     start_time = signal[0,0]
     end_time = signal[-1,0]
     for l in signal: l[0] = l[0]*mult
-    f = interpolate.interp1d(signal[:,0], signal[:,1])
+    f_i = interpolate.interp1d(signal[:,0], signal[:,1])
     time = np.arange(start_time, end_time, 1.0/sampling_rate)
-    new_y = f(time)
+    time = time[time<signal[-1, 0]]
+    new_y = f_i(time)
 
     new_signal = np.vstack( (time, new_y) ).T
     new_signal = extract_section(new_signal, start_time, end_time)
@@ -94,7 +96,7 @@ def sliding_xcorr(v, a, winSize, step, sub_plot):
 
         shift_now = y[np.argmax(cross_corr)]
         # print "Data from %.1f to %.1f is shifted by %fs" %(windowStart, windowEnd, y[np.argmax(cross_corr)])
-        if shift_now<shift_before/100: break
+        # if shift_now<shift_before/100: break
         summ = summ + np.abs(shift_now-shift_before)
         count = count+1
         shift_before = shift_now

@@ -9,7 +9,7 @@ sampling_rate = 50
 x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
-acceleration = f.addDrift(acceleration, 1.05, sampling_rate)
+acceleration = f.addDrift(acceleration, 0.95, sampling_rate)
 
 # acceleration = f.addShift(acceleration, 0.5)
 
