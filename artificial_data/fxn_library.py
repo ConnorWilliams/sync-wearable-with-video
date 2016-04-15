@@ -35,29 +35,7 @@ def getVel_Acc(pos_signal):
     pos_signal = np.hstack((pos_signal, x_vel[:,None]))
     pos_signal = np.hstack((pos_signal, x_acc[:,None]))
     return pos_signal
-
-
-def addDrift(signal, mult, sampling_rate):
-    start_time = signal[0,0]
-    end_time = signal[-1,0]
-    for l in signal: l[0] = l[0]*mult
-    f_i = interpolate.interp1d(signal[:,0], signal[:,1])
-    time = np.arange(start_time, end_time, 1.0/sampling_rate)
-    time = time[time<signal[-1, 0]]
-    new_y = f_i(time)
-
-    new_signal = np.vstack( (time, new_y) ).T
-    new_signal = extract_section(new_signal, start_time, end_time)
-    return new_signal
-
-
-def addShift(signal, shift):
-    start_time = signal[0,0]
-    end_time = signal[-1,0]
-    for l in signal: l[0] = l[0]+shift
-    new_signal = extract_section(signal, start_time, end_time)
-    return new_signal
-
+    
 
 def extract_section(whole, start_time, end_time):
     partial = whole[whole[:,0]>start_time, :]

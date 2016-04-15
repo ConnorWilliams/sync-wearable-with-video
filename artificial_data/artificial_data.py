@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import fxn_library as f
+import temporal_distortion
 
 start_time = 0
 end_time = 60
@@ -9,9 +10,10 @@ sampling_rate = 50
 x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
-acceleration = f.addDrift(acceleration, 0.95, sampling_rate)
-
-# acceleration = f.addShift(acceleration, 0.5)
+# acceleration = temporal_distortion.constant(acceleration, 0.5)
+# acceleration = temporal_distortion.linear(acceleration, 0.95, sampling_rate)
+# acceleration = temporal_distortion.periodic(acceleration, 0.95, 1.05, sampling_rate)
+# acceleration = temporal_distortion.triangular(acceleration, 0.95, 1.05, sampling_rate)
 
 cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
 
