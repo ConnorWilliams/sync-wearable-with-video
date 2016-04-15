@@ -35,7 +35,7 @@ def getVel_Acc(pos_signal):
     pos_signal = np.hstack((pos_signal, x_vel[:,None]))
     pos_signal = np.hstack((pos_signal, x_acc[:,None]))
     return pos_signal
-    
+
 
 def extract_section(whole, start_time, end_time):
     partial = whole[whole[:,0]>start_time, :]
@@ -54,16 +54,19 @@ def sliding_xcorr(v, a, winSize, step, sub_plot):
     count = 0
 
     # Do the work
+    offset = winSize/2
+    shifts = [0]
+    times = [0]
     for windowStart in np.arange(minTime, maxTime-winSize, step):
         windowEnd = windowStart + winSize
         pv = extract_section(v, windowStart, windowEnd)
-        pa = extract_section(a, windowStart, windowEnd)
-        windowFunc = np.blackman(len(pv))
+        pa = extract_section(a, windowStart+offset, windowEnd+offset)
+        # windowFunc = np.hanning(len(pv))
         # cross_corr, norm_cross_corr = x_corr(pv[:,3]*windowFunc, pa[:,1]*windowFunc)
         cross_corr, norm_cross_corr = x_corr(pv[:,3], pa[:,1])
         height = cross_corr.shape[0]
 
-        x = np.ones(height)*windowStart
+        x = np.ones(height)*windowStart+(winSize/2)
         y = np.linspace(-winSize, winSize, height)
         n = cross_corr
         if y.size==x.size+1: y=np.delete(y,-1)
@@ -73,6 +76,9 @@ def sliding_xcorr(v, a, winSize, step, sub_plot):
             sys.exit()
 
         shift_now = y[np.argmax(cross_corr)]
+        offset += shift_now
+        shifts.append(offset)
+        times.append((windowStart+winSize/2))
         # print "Data from %.1f to %.1f is shifted by %fs" %(windowStart, windowEnd, y[np.argmax(cross_corr)])
         # if shift_now<shift_before/100: break
         summ = summ + np.abs(shift_now-shift_before)
@@ -80,9 +86,17 @@ def sliding_xcorr(v, a, winSize, step, sub_plot):
         shift_before = shift_now
         sub_plot.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
 
+    times_hat = np.array(shifts) + times
+    print np.c_[times, times_hat]
+    f_i = interpolate.interp1d(times_hat, times, bounds_error=False)
+    # plt.figure()
+    # plt.plot(v[:,0], v[:,0])
+    # plt.plot(v[:,0], f_i(v[:,0]), "-o")
+    # plt.show()
+    # sub_plot.plot(times, shifts)
     drift = summ/count
-    print "Drift =", drift/step, "shift/s"
-    return drift
+    # print "Drift =", drift/step, "shift/s"
+    return f_i(a[:,0])
 
 def x_corr(v, a):
     nv = (v - np.mean(v)) /  np.std(v)

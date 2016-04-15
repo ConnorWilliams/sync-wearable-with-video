@@ -11,8 +11,8 @@ x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
 # acceleration = temporal_distortion.constant(acceleration, 0.5)
-# acceleration = temporal_distortion.linear(acceleration, 0.95, sampling_rate)
-# acceleration = temporal_distortion.periodic(acceleration, 0.95, 1.05, sampling_rate)
+acceleration = temporal_distortion.linear(acceleration, 0.95, sampling_rate)
+# acceleration = temporal_distortion.periodic(acceleration, 0.9, 1.1, sampling_rate)
 # acceleration = temporal_distortion.triangular(acceleration, 0.95, 1.05, sampling_rate)
 
 cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
@@ -20,10 +20,12 @@ cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
 _, plotnum = plt.subplots(3, sharex=True)
 
 winSize = 3
-stepSize = 1
-drift = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plotnum[1])
+stepSize = 0.1
+new_times = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plotnum[1])
 
-new_times = acceleration[:,0] - (acceleration[:,0]*drift)
+# new_times = acceleration[:,0] - (acceleration[:,0]*drift)
+print new_times.shape
+print acceleration.shape
 
 plotnum[0].set_title("Original Data")
 plotnum[0].plot(x_pos[:,0], x_pos[:,3])
