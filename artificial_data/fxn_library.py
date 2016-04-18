@@ -43,60 +43,47 @@ def extract_section(whole, start_time, end_time):
     return partial
 
 
-def sliding_xcorr(v, a, winSize, step, sub_plot):
+def sliding_xcorr(v, a, windowSize, step, sub_plot):
     maxTime = max( max(v[:,0]), max(a[:,0]) )
     minTime = min( min(v[:,0]), min(a[:,0]) )
     sub_plot.plot()
 
-    shift_before = 0
-    shift_now = 0
-    summ = 0
-    count = 0
-
     # Do the work
-    offset = winSize/2
-    shifts = [0]
-    times = [0]
-    for windowStart in np.arange(minTime, maxTime-winSize, step):
-        windowEnd = windowStart + winSize
+    window_lag = 0
+    lags = [0]
+    true_times = [0]
+    for windowStart in np.arange(minTime, maxTime-windowSize, step):
+        windowEnd = windowStart + windowSize
         pv = extract_section(v, windowStart, windowEnd)
-        pa = extract_section(a, windowStart+offset, windowEnd+offset)
-        # windowFunc = np.hanning(len(pv))
-        # cross_corr, norm_cross_corr = x_corr(pv[:,3]*windowFunc, pa[:,1]*windowFunc)
+        # Plus the previous window lag so we get the DATA we want. It will be shifted along a bit.
+        pa = extract_section(a, windowStart+window_lag, windowEnd+window_lag)
         cross_corr, norm_cross_corr = x_corr(pv[:,3], pa[:,1])
         height = cross_corr.shape[0]
 
-        x = np.ones(height)*windowStart+(winSize/2)
-        y = np.linspace(-winSize, winSize, height)
-        n = cross_corr
-        if y.size==x.size+1: y=np.delete(y,-1)
+        x = np.ones(height)*(windowStart)                # Start of the window
+        y = np.linspace(-windowSize, windowSize, height) # Every cross_corr value gets a point
+        n = cross_corr                                   # Color the points as a fxn of the cross_corr values
+
+        # if y.size==x.size+1: y=np.delete(y,-1)
         if (x.size!=y.size or y.size!=n.size or x.size!=n.size):
             error = "Error: Size Mismatch in sliding_xcorr; x.size=%.0f, y.size=%.0f, n.size=%.0f" %(x.size, y.size, n.size)
             print >>sys.stderr, error
             sys.exit()
 
-        shift_now = y[np.argmax(cross_corr)]
-        offset += shift_now
-        shifts.append(offset)
-        times.append((windowStart+winSize/2))
-        # print "Data from %.1f to %.1f is shifted by %fs" %(windowStart, windowEnd, y[np.argmax(cross_corr)])
-        # if shift_now<shift_before/100: break
-        summ = summ + np.abs(shift_now-shift_before)
-        count = count+1
-        shift_before = shift_now
+        window_lag += y[np.argmax(cross_corr)]
+        lags.append(window_lag)
+        true_times.append(windowStart)
+        # print "Data from %.1f to %.1f is shifted by %fs. window_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(cross_corr)], window_lag)
         sub_plot.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
 
-    times_hat = np.array(shifts) + times
-    print np.c_[times, times_hat]
-    f_i = interpolate.interp1d(times_hat, times, bounds_error=False)
+    wrong_times = np.array(true_times)+lags
+    f_i = interpolate.interp1d(wrong_times, true_times, bounds_error=False)
     # plt.figure()
     # plt.plot(v[:,0], v[:,0])
     # plt.plot(v[:,0], f_i(v[:,0]), "-o")
     # plt.show()
-    # sub_plot.plot(times, shifts)
-    drift = summ/count
-    # print "Drift =", drift/step, "shift/s"
-    return f_i(a[:,0])
+    # sub_plot.plot(true_times, lags)
+    return f_i
 
 def x_corr(v, a):
     nv = (v - np.mean(v)) /  np.std(v)
