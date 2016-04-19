@@ -15,14 +15,7 @@
 % communicate highly technical material.
 
 \section{Initial solution ideas}
-In a centralized system the solution is trivial; the centralized server will
-dictate the system time. Cristian's algorithm and the Berkeley Algorithm are
-some solutions to the clock synchronization problem in a centralized server
-environment. In a distributed system the problem takes on more complexity because
-a global time is not easily known. The most used clock synchronization solution on
-the Internet is the Network Time Protocol (NTP) which is a layered client-server
-architecture based on UDP message passing. Lamport timestamps and vector clocks
-are concepts of the logical clocks in distributed systems.
+In a centralized system the solution is trivial; the centralized server will dictate the system time. Cristian's algorithm and the Berkeley Algorithm are some solutions to the clock synchronization problem in a centralized server environment. In a distributed system the problem takes on more complexity because a global time is not easily known. The most used clock synchronization solution on the Internet is the Network Time Protocol (NTP) which is a layered client-server architecture based on UDP message passing. Lamport timestamps and vector clocks are concepts of the logical clocks in distributed systems.
 
 Cristian's algorithm
 Cristian's algorithm relies on the existence of a time server. The time

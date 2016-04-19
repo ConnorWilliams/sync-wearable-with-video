@@ -1,5 +1,8 @@
 visualise_skeleton/out/*
 
+*.odt*
+*.png
+
 # Compiled source #
 ###################
 *.com

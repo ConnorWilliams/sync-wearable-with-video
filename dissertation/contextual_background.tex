@@ -35,20 +35,65 @@
 %           in terms of time and space, and show the proposed improvements
 %           are worthwhile.
 
-This project could be broken down in the following steps:
+Obesity, depression, stroke, falls, cardiovascular and musculoskeletal disease are some of the biggest health issues and fastest-rising categories of healthcare costs in the UK. The associated expenditure is widely regarded as unsustainable and the impact on quality of life is felt by millions of people in the UK each day. With a rapidly ageing population - could technology be the answer to some of these problems?
+
+\href{http://www.irc-sphere.ac.uk/}{SPHERE (a Sensor Platform for HEalthcare in a Residential Environment)}, a partnership between University of Bristol, University of Reading and University of Southampton, is developing a number of different sensors that will combine to build a picture of how we live in our homes. This information can then be used to spot issues that might indicate a medical or well-being problem.
+
+The technology could help by:
+\begin{itemize}
+    \item Predicting falls and detecting strokes so that help may be summoned.
+    \item Analysing eating behaviour - including whether people are taking prescribed medication.
+    \item Detecting periods of depression or anxiety.
+\end{itemize}
+\cite{sphere_website}
+
+SPHERE will work with clinicians, engineers, designers and social care professionals as well as members of the public to develop these sensor technologies, making sure that the technology is acceptable in people's homes and solves real healthcare problems in a cost effective way. The SPHERE project also aims to generate knowledge that will change clinical practice, achieved by focusing on real-world technologies that can be shown working in a large number of local homes.
+
+Within the SPHERE research group, one of the sensors being developed is a wearable accelerometer. It was decided that an accelerometer would be useful for monitoring health because\ldots Currently, this accelerometer induces a drift between the true time and the local time on the device which is large enough that the wearable needs to be re-synchronised after every 20 minute use which is clearly not ideal. This document looks to consider video data from the RGB-D cameras around the house, which provide data on where the person is, together with the acceleration data from the wearable accelerometer. With this data it should be possible to design an algorithm which automatically corrects for the time drift so that the accelerometer and the video data remain synchronised.
+
+\subsection{Sensors and the Smart Home} 
+Currently all sensors in the home are synchronised with NTP (Network Time Protocol) however the procedure that is currently in place is infeasible for real deployments because\ldots
+ 
+\subsubsection{Accelerometers}
+Participants wear a sensor equipped with a tri-axial accelerometer on the dominant wrist, attached using a strap. The sensor wirelessly transmits data using the BLE (Bluetooth Low Energy) standard to several receivers positioned within the house. The outputs of these sensors are a continuous numerical stream of the accelerometer readings in units of g. Accompanying the accelerometer readings are the RSSI (Received Signal Strength Indications) that were recorded by each access point. The accelerometers record data at 20Hz, and the accelerometer readings range is ±8g. RSSI values are also recorded at 20 Hz, and values are no lower than -110 dBm.
+
+Due to the nature of the sensing platform, there may be missing packets from the data.
+
+\subsubsection{RGB-D Cameras}
+Video recordings are taken using ASUS Xtion PRO RGB-D cameras. Automatic detection of humans is performed using the OpenNI library, and false positive detections were manually removed by the organizers by visual inspection. In order to preserve the anonymity of the participants the raw video data are not shared. Instead, the coordinates of the 2D bounding box, 2D centre of mass, 3D bounding box and 3D centre of mass are provided. The units of 2D coordinates are in pixels (i.e. number of pixels down and right from the upper left hand corner) from an image of size 640×480 pixels. The coordinate system of the 3D data is axis aligned with the 2D bounding box, with a supplementary dimension that projects from the central position of the video frames. The first two dimensions specify the vertical and horizontal displacement of a point from the central vector (in millimetres), and the final dimension specifies the projection of the object along the central vector (again, in millimetres).
+
+RGB-D cameras are located in the living room, hallway, and the kitchen. No cameras are located elsewhere in the residence.
+
+The current solution for avoiding this time drift affect the SPHERE group is to synchronize the sensor every X minutes?
+
+This algorithm could more generally be used to synchronize two 1-dimensional signals such as voice recordings.
+
+If the algorithm as a result of this project is able to correct for the drift of the SPHERE data, it will allow for advancements in the SPHERE project such as:
 \begin{enumerate}
-    \item Consider different types of temporal distortions which could take place
-        on a device such as this one.
-    \item Implement a program which generates data and can apply any combination
-        of the different types of temporal distortion.
-    \item Devise a method to compensate for the different temporal distortions.
-    \item Given a synchronised set of data from the accelerometer and the
-        cameras, introduce artificial drifts between data sets and assess how well
-        the methods work.
-    \item Apply this method to real drifted data which has already been
-        collected in the SPHERE house in three locations; hallway, living room and kitchen.
+	\item Detecting strokes????
 \end{enumerate}
 
-Implicit to all of these steps will is a fair amount of data formatting and
-visualisation. I use Python for the implementation with SciPy which
-is an open source library of scientific tools for Python.
+Challenges involved in this project are:
+\begin{enumerate}
+	\item NTP is infeasible because\ldots
+	\item Don’t know the current time drifts.
+\end{enumerate}
+
+The high level objective of this project is to create an algorithm which can synchronize a 1-dimensional signal $A$ with a ground truth signal $B$ given that signal $A$ has been affected by one of the following temporal distortions:
+\begin{itemize}
+	\item No Distortion
+	\item Constant offset
+	\item Linear Distortion
+	\item Periodic Distortion
+	\item Triangular Distortion
+\end{itemize}
+
+This project could be broken down in the following steps:
+\begin{enumerate}
+    \item Consider different types of temporal distortions which could take place on a device such as this one.
+    \item Implement a program which generates synthetic data and can apply any combination of the different types of temporal distortion.
+    \item Devise a method to compensate for the different temporal distortions.
+    \item Given a synchronised set of data from the accelerometer and the cameras, introduce artificial drifts between data sets and assess how well the method works. This may reveal new information about the SPHERE data which could influence the future of the project.
+\end{enumerate}
+
+Implicit to all of these steps is a fair amount of data formatting and visualisation. I used Python for the implementation with SciPy which is an open source library of scientific tools for Python.
