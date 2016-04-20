@@ -3,7 +3,7 @@
 % A compulsory chapter of roughly 10 pages
 %
 % Describe the technical basis on which execution of the project depends.
-% Provide a detailed explanation of the specific problem at hand
+% Provide a detailed explanation of the specific problem at hand.
 % Existing work that is relevant (e.g.an existing algorithm that you use,
 % alternative solutions proposed, supporting technologies).
 %
@@ -14,93 +14,43 @@
 % Give the reader confidence that you are able to absorb, understand and clearly
 % communicate highly technical material.
 
-\section{Initial solution ideas}
-In a centralized system the solution is trivial; the centralized server will dictate the system time. Cristian's algorithm and the Berkeley Algorithm are some solutions to the clock synchronization problem in a centralized server environment. In a distributed system the problem takes on more complexity because a global time is not easily known. The most used clock synchronization solution on the Internet is the Network Time Protocol (NTP) which is a layered client-server architecture based on UDP message passing. Lamport timestamps and vector clocks are concepts of the logical clocks in distributed systems.
+\section{Synchronising two device clocks}
+One way to interpret the problem at hand would be to treat it as an issue of finding a ground truth time when two clocks are running out of synchronisation from each other.
 
-Cristian's algorithm
-Cristian's algorithm relies on the existence of a time server. The time
-server maintains its clock by using a radio clock or other accurate time source,
-then all other computers in the system stay synchronized with it. A time client
-will maintain its clock by making a procedure call to the time server. Variations
-of this algorithm make more precise time calculations by factoring in network radio
-propagation time.
+In a system where all of the sensors were connected to a central device the solution is trivial; the centralized device will dictate the system time. Cristian's algorithm and the Berkeley Algorithm, described below, are some solutions to the clock synchronization problem in a centralized server environment.
 
-Berkeley algorithm
-The Berkeley algorithm is suitable for systems where a radio clock is not present,
-this system has no way of making sure of the actual time other than by maintaining
-a global average time as the global time. A time server will periodically fetch
-the time from all the time clients, average the results, and then report back to
-the clients the adjustment that needs be made to their local clocks to achieve
-the average. This algorithm highlights the fact that internal clocks may vary
-not only in the time they contain but also in the clock rate.
+In a distributed system, such as the one we have, the problem takes on more complexity because a global time is not easily known. The most used clock synchronization solution on the Internet is the Network Time Protocol (NTP) which is a layered client-server architecture based on UDP message passing.
 
-Often, any client whose clock differs by a value outside of a given tolerance is
-disregarded when averaging the results. This prevents the overall system time
-from being drastically skewed due to one erroneous clock.
+\subsection{Cristian's algorithm}
+Cristian's algorithm relies on the existence of a time server. The time server maintains its clock by using a radio clock or other accurate time source, then all other computers in the system stay synchronized with it. A time client will maintain its clock by making a procedure call to the time server. Variations of this algorithm make more precise time calculations by factoring in network radio propagation time.
 
-Network Time Protocol
-Network Time Protocol a class of mutual network synchronization protocol that
-allows for use-selectable policy control in the design of the time synchronization
-and evidence model. NTP supports single inline and meshed operating models in
-which a clearly defined master source of time is used ones in which no penultimate
-master or reference clocks are needed.
+\subsection{Berkeley algorithm}
+The Berkeley algorithm is suitable for systems where a radio clock is not present, this system has no way of making sure of the actual time other than by maintaining a global average time as the global time. A time server will periodically fetch the time from all the time clients, average the results, and then report back to the clients the adjustment that needs be made to their local clocks to achieve the average. This algorithm highlights the fact that internal clocks may vary not only in the time they contain but also in the clock rate.
 
-In NTP service topologies based on peering, all clocks equally participate in
-the synchronization of the network by exchanging their timestamps using regular
-beacon packets. In addition NTP supports a unicast type time transfer which
-provides a higher level of security. NTP performance is tunable based on its
-application and environmental loading as well. NTP combines a number of
-algorithms to robustly select and compare clocks, together with a combination of
-linear and decision-based control loop feedback models that allows multiple time
-synchronization probes to be combined over long time periods to produce high
-quality timing and clock drift estimates. Because NTP allows arbitrary
-synchronization mesh topologies, and can withstand (up to a point) both the loss
-of connectivity to other nodes, and \"falsetickers\" that do not give consistent
-time, it is also robust against failure and misconfiguration of other nodes in
-the synchronization mesh.
+Often, any client whose clock differs by a value outside of a given tolerance is disregarded when averaging the results. This prevents the overall system time from being drastically skewed due to one erroneous clock.
 
-NTP is highly robust, widely deployed throughout the Internet, and well tested
-over the years, and is generally regarded as the state of the art in distributed
-time synchronization protocols for unreliable networks. It can reduce synchronization
-offsets to times of the order of a few milliseconds over the public Internet,
-and to sub-millisecond levels over local area networks.
+\subsection{Network Time Protocol}
+Network Time Protocol a class of mutual network synchronization protocol that allows for use-selectable policy control in the design of the time synchronization and evidence model. NTP supports single inline and meshed operating models in which a clearly defined master source of time is used ones in which no penultimate master or reference clocks are needed.
 
-A simplified version of the NTP protocol, SNTP, can also be used as a pure
-single-shot stateless master-slave synchronization protocol, but lacks the
-sophisticated features of NTP, and thus has much lower performance and reliability
-levels.
+In NTP service topologies based on peering, all clocks equally participate in the synchronization of the network by exchanging their timestamps using regular beacon packets. In addition NTP supports a unicast type time transfer which provides a higher level of security. NTP performance is tunable based on its application and environmental loading as well. NTP combines a number of algorithms to robustly select and compare clocks, together with a combination of linear and decision-based control loop feedback models that allows multiple time synchronization probes to be combined over long time periods to produce high quality timing and clock drift estimates. Because NTP allows arbitrary synchronization mesh topologies, and can withstand (up to a point) both the loss of connectivity to other nodes, and \"falsetickers\" that do not give consistent time, it is also robust against failure and misconfiguration of other nodes in the synchronization mesh.
 
-Clock Sampling Mutual Network Synchronization
-CS-MNS is suitable for distributed and mobile applications. It has been shown to
-be scalable over mesh networks that include indirectly linked non-adjacent nodes,
-and compatible to IEEE 802.11 and similar standards. It can be accurate to the order
-of few microseconds, but requires direct physical wireless connectivity with
-negligible link delay (less than 1 microsecond) on links between adjacent nodes,
-limiting the distance between neighboring nodes to a few hundred meters.
+NTP is highly robust, widely deployed throughout the Internet, and well tested over the years, and is generally regarded as the state of the art in distributed time synchronization protocols for unreliable networks. It can reduce synchronization
+offsets to times of the order of a few milliseconds over the public Internet, and to sub-millisecond levels over local area networks.
 
-Precision Time Protocol
-Precision Time Protocol (PTP) is a master/slave protocol for delivery of highly
-accurate time over local area networks
+A simplified version of the NTP protocol, SNTP, can also be used as a pure single-shot stateless master-slave synchronization protocol, but lacks the sophisticated features of NTP, and thus has much lower performance and reliability levels. \cite{wikipedia_clock_synchronisation}
 
-Synchronous Ethernet
-Synchronous Ethernet uses Ethernet in a synchronous manner such that when
-combined with synchronization protocols such as Precision Time Protocol in the
-case of the White Rabbit Project, sub-nanosecond synchronization accuracy may be
-achieved.
+There are also other clock synchronisation methods over connected devices such as Clock Sampling Mutual Network Synchronization, Precision Time Protocol, Synchronous Ethernet, Reference Broadcast Synchronization and even Global Positioning System.
 
-Reference broadcast synchronization
-The Reference Broadcast Synchronization (RBS) algorithm is often used in
-wireless networks and sensor networks. In this scheme, an initiator broadcasts a
-reference message to urge the receivers to adjust their clocks.
-
-Reference Broadcast Infrastructure Synchronization
-The Reference Broadcast Infrastructure Synchronization (RBIS) protocol is a
-master/slave synchronization protocol based on the receiver/receiver
-synchronization paradigm, as RBS. It is specifically tailored to be used in IEEE
-802.11 Wi-Fi networks configured in infrastructure mode (i.e., coordinated by an
-access point). The protocol does not require any modification to the access point.
-
-Global Positioning System
-The Global Positioning System can also be used for clock synchronization. The
-accuracy of GPS time signals is ±10 ns[7] and is second only to the atomic
-clocks upon which they are based.
+\section{Synchronise two 1-dimensional signals along the time axis}
+The way which I have found a solution to this problem is by synchronising the data after it has been collected. 
+\begin{itemize}
+    \item Can derive acceleration from position.
+    \item Show derived acceleration from video data is highly correlated with accelerometer data when time is not drifted. This justifies this way is the right way.
+    \item Example with simple data.
+    \item How does one track a drift?
+    \item What does 'drift' even mean?
+    \item Dynamic Time Warping - why won't it work?
+    \item Cross correlation - why won't it work?
+    \item Sliding window cross sorrelation - how might it work? pseudo code?
+    \item Periodic data - how do we avoid cyclic maximums of cross correlation?
+\end{itemize}

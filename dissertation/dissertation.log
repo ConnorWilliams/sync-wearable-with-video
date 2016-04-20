@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.3.31)  19 APR 2016 17:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.3.31)  20 APR 2016 16:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**dissertation
+**dissertation.tex
 (./dissertation.tex
 LaTeX2e <2015/01/01>
 Babel <3.9l> and hyphenation patterns for 79 languages loaded.
@@ -601,7 +601,7 @@ LaTeX Info: Redefining \nameref on input line 40.
 \openout4 = `dissertation.out'.
 
 
-<logo/logo_uob_color.pdf, id=52, 546.04pt x 158.5925pt>
+<logo/logo_uob_color.pdf, id=56, 546.04pt x 158.5925pt>
 File: logo/logo_uob_color.pdf Graphic file (type pdf)
 
 <use logo/logo_uob_color.pdf>
@@ -691,17 +691,19 @@ l.1 \chapter
 ]
 Chapter 2.
 [5]
-Missing character: There is no Â in font cmr10!
-Missing character: There is no ± in font cmr10!
+
+LaTeX Warning: Citation `wikipedia_clock_synchronisation' on page 6 undefined o
+n input line 40.
+
 ) (./project_execution.tex [6]
 Chapter 3.
-) (./critical_evaluation.tex [7
+[7
 
-] [8
-
-]
+]) (./critical_evaluation.tex [8]
 Chapter 4.
-) (./conclusion.tex [9] [10
+) (./conclusion.tex [9
+
+] [10
 
 ]
 Chapter 5.
@@ -717,16 +719,20 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 84.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 84.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 84.
 Package rerunfilecheck Info: File `dissertation.out' has not changed.
-(rerunfilecheck)             Checksum: 0E320E05295A231A6A120918CBCD169A;663.
+(rerunfilecheck)             Checksum: 4EEA3258A0C23FBE4EABE6576F459F5E;776.
+
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 12173 strings out of 493085
- 182529 string characters out of 6136917
+ 12182 strings out of 493085
+ 182655 string characters out of 6136917
  431509 words of memory out of 5000000
- 15381 multiletter control sequences out of 15000+600000
+ 15383 multiletter control sequences out of 15000+600000
  8721 words of font info for 33 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,11n,45p,1041b,330s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,11n,45p,1045b,390s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texl
@@ -736,10 +742,10 @@ mf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist
 type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
 blic/amsfonts/cm/cmsl10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
 msfonts/cm/cmsy10.pfb>
-Output written on dissertation.pdf (27 pages, 147661 bytes).
+Output written on dissertation.pdf (27 pages, 153397 bytes).
 PDF statistics:
- 258 PDF objects out of 1000 (max. 8388607)
- 216 compressed objects within 3 object streams
- 59 named destinations out of 1000 (max. 500000)
- 102 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 270 PDF objects out of 1000 (max. 8388607)
+ 228 compressed objects within 3 object streams
+ 66 named destinations out of 1000 (max. 500000)
+ 110 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -37,3 +37,39 @@ types of temporal distortion.
     \item Do other temporal distortions affect the performance?
     \item What combination of distortions are amendanble?
 \end{itemize}
+
+The project began with me being supplied with a set of synchronized data which had been collected from the SPHERE house. My initial task was to figure out what the data contained. At this point I created a repository on GitHub and a CS Blog which Peter and Niall could subscribe to. The data contained three different files which could be of interest to me:
+\begin{itemize}
+    \item Video data: Frame index and timestamp.
+    \item Skeleton data: Frame index and user's 3D joint positions.
+    \item Accelerometer data: Timestamp and X,Y,Z acceleration.
+\end{itemize}
+
+I first decided to visualise the data, looking for properties which could be useful for synchronisation, for example periodic sections of data or extreme movements. I was also supplied with a program which had previously been used to visualise skeleton data from a Kinect camera. I have edited this program in order for me to be able to visualise the skeleton data I have.
+
+The next step included some data formatting and pre processing of the data:
+\begin{itemize}
+    \item Removed accelerometer data which is collected before a skeleton is detected.
+    \item Extracted data segments between two time points.
+    \item f(x) = position, f'(x) = velocity, f''(x) = acceleration
+    \item Differentiate video data twice to obtain velocity and acceleration.
+    \item Integrate accelerometer data twice to obtain velocity and position.
+    \item Plotted sub-sequences of data in different ways to confirm correspondence of the data. Different joints, components and differentials of the data returned much different visualisations which made it difficult to decide which would be best to use in general.
+\end{itemize}
+
+At this point I felt that I understood the problem enough to begin to look at similar problems and papers which could help me move towards a solution. It initially seemed like a trivial problem or at least one which must have come up before. Surely device clocks always run out of sync? I also naively assumed a time drift to simply mean one clock is running faster than the other. I came across loads of papers which solved the problem of device clocks running at different rates but all used networks or data from other hardware components like gyroscopes, which would not work for the devices and data we have.
+
+It seemed that a few papers mentioned cross-correlation for synchronising signals and tracking shifted data. For this reason I researched what it was and how (if at all) it could be used to track the drift. It could be used 'out of the box' to detect a shift, but not a drift due to the fact that a drift is a shift over time. I proceeded to plot the cross-correlation between the accelerometer and skeleton data to see if I could observe anything useful, however at this stage I came across a few difficulties:
+\begin{enumerate}
+    \item The video data is extremely noisy and differentiating it results in amplified noise. Can we use smoothing or do we need to tackle the problem without differentiation?
+    \item The video data has a huge feature set after the data formatting and pre-processing where I calculated velocity and acceleration. There are 10 joints which may all be correlated in some way to the acceleration of the dominant wrist, and each joint has 3 dimensions. There is a decision to be made to choose which one(s) to use?
+    \item Literature on similar problems claim that PCA is required to reduce dimensionality and is useful when compensating for the accelerometer rotating around an axis.
+\end{enumerate}   
+
+Because of these complications, I decided to try and ignore the complexity of the data for the time being by creating my own data and starting from a simple data set. I generated a sine wave which represents one feature from the video data e.g. the X position of the right wrist. I have calculated the second derivative of this sine wave which in this example represents be the X acceleration of the right wrist. I have then added a time drift to this acceleration data.
+
+At this point I started to notice that there are many variables which could affect a device clock and time drifts could actually be a lot more complicated than I first thought. Things which affect clock speed are:
+
+From here, I plotted the cross correlation of this data which, as mentioned before, could not be used on it's own to track the drift. Because a drift is a shift over time, the cross correlation of a small window of data could be used to correlate that window. Building on this idea, I plotted a sliding window cross-correlation which can detect the lag at every time window. If the data is periodic, this window size must be smaller than the time period.
+
+The plot of this data was a lot more interesting and I was visually able to track the drift. There was however an issue that because the data is periodic, the cross correlation of a window could be maximal at different lags. I needed to figure out how to solve this problem. One simple but not ideal way to do it was to say if the time drift suddenly jumps from a high number to zero, this is the case where we are getting a cyclic maximum x corr. 

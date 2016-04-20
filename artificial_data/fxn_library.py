@@ -64,7 +64,6 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
         y = np.linspace(-windowSize, windowSize, height) # Every cross_corr value gets a point
         n = cross_corr                                   # Color the points as a fxn of the cross_corr values
 
-        # if y.size==x.size+1: y=np.delete(y,-1)
         if (x.size!=y.size or y.size!=n.size or x.size!=n.size):
             error = "Error: Size Mismatch in sliding_xcorr; x.size=%.0f, y.size=%.0f, n.size=%.0f" %(x.size, y.size, n.size)
             print >>sys.stderr, error
