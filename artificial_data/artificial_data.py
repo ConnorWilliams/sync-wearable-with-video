@@ -13,7 +13,7 @@ x_pos = f.getVel_Acc(x_pos)
 # acceleration = temporal_distortion.constant(acceleration, 0.5)
 # acceleration = temporal_distortion.linear(acceleration, 0.1, sampling_rate)
 # acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
-acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
+# acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
 
 cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
 

@@ -1,36 +1,50 @@
-import random
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_absolute_error
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+from scipy import interpolate
 import pre_processing as pre
-import programatic
+import fxn_library as f
+import temporal_distortion
 np.set_printoptions(threshold=np.nan)
 np.set_printoptions(suppress=True)
 
+def addTime(t, interval):
+    ms = s = m = h = 0
+    s, ms = divmod(interval, 1000)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    t = str(t)
+    th = int(t[:2])+h
+    tm = int(t[2:4])+m
+    ts = int(t[4:6])+s
+    tms = int(t[6:])+ms
+    ms = s = m = h = 0
+    s, tms = divmod(tms, 1000)
+    ts = ts+s
+    m, ts = divmod(ts, 60)
+    tm = tm+m
+    h, tm = divmod(tm, 60)
+    th = th+h
+    newTime = str(th)+str(tm)+str(ts)+str(format(tms,'03'))
+    print "%s + %ds = %s" %(t, interval/1000, newTime)
+    return int(newTime)
+
 #---- VARIABLES (Change) ----#
-time_interval = 180000 #(ms)
+time_interval = 30000 #(milliseconds)
 start_time = 143419000
 date_dir = "Rec_10_06_15_15_33_04_yangdi_1/"
 size_of_kernel = 15
 
-
 #---- DEFINITIONS (Do not change)----#
-end_time = start_time+time_interval
-maxTime = 0
-rightWrist = 7 + (8*4)
-torso = 7 + (9*4)
+end_time = addTime(start_time, time_interval)
 acc0_dir = "ACC0.000000/"
 acc1_dir = "ACC1.000000/"
 dev_dir = "Dev0.000000/"
 ts_info_filename = date_dir + dev_dir + 'frameTSinfo0.000000.txt'
 ts_info_names = ("imName", "idxColour", "tsColour", "idxDepth", "tsDepth", "diff", "tsRecDvc")
-video_filename = top_dir + date_dir + dev_dir + 'user1.txt'
+video_filename = date_dir + dev_dir + 'user1.txt'
 video_names = ()
-acc0_filename = top_dir + date_dir + acc0_dir + 'ACC_0.000000.txt'
-acc1_filename = top_dir + date_dir + acc1_dir + 'ACC_1.000000.txt'
+acc0_filename = date_dir + acc0_dir + 'ACC_0.000000.txt'
+acc1_filename = date_dir + acc1_dir + 'ACC_1.000000.txt'
 acc_names = ("idx", "diff", "tsRecDvc", "AccX", "AccY", "AccZ", "tsInternal")
 
 
@@ -42,8 +56,9 @@ acc0 = pre.readFile(acc0_filename, "\t")
 acc1 = pre.readFile(acc1_filename, "\t")
 print 'Files read successfully...'
 
+minTime = max(ts_info[0,6], acc0[0,2], acc1[0,2])
 maxTime = min(ts_info[-1,6], acc0[-1,2], acc1[-1,2])
-end_time = min(start_time+time_interval, maxTime)
+end_time = min(end_time, maxTime)
 
 # Trim ts_info to accomodate for video running before skeleton is detected
 while ts_info[0][0] < video[0][0]:
@@ -55,40 +70,24 @@ video = np.delete(video,0,1)
 video = np.hstack((ts_info, video))
 print 'Joined ts_info and video...'
 
-# Uncomment this section to generate the skeleton image!!
-# skeleton = pre.extract_skeleton(video, start_time, end_time, 6)
-# import os, shutil
-# folder = 'out'
-# for the_file in os.listdir(folder):
-#     file_path = os.path.join(folder, the_file)
-#     try:
-#         if os.path.isfile(file_path):
-#             os.unlink(file_path)
-#         #elif os.path.isdir(file_path): shutil.rmtree(file_path)
-#     except Exception, e:
-#         print e
-# programatic.makeImage( skeleton )
+print "Data is from %s to %s" %(pre.getTime(minTime), pre.getTime(maxTime))
 
 # Extract the sections we are interested in
-acc0 = pre.extract_acc_section(acc0, start_time, end_time, 2)
-acc1 = pre.extract_acc_section(acc1, start_time, end_time, 2)
-video = pre.extract_vid_section(video, start_time, end_time, 6, rightWrist)
+acc0 = pre.extract_acc_section(acc0, start_time, end_time)
+acc1 = pre.extract_acc_section(acc1, start_time, end_time)
+video = pre.extract_vid_section(video, start_time, end_time, pre.joint(8))
 
-print "video sampling rate =", video.shape[0]/18,"Hz"
-print "acc sampling rate =", acc0.shape[0]/18,"Hz"
+acc0 = acc0[acc0[:,0]<video[-1,0]]
+acc0 = acc0[acc0[:,0]>video[0,0]]
+f_x = interpolate.interp1d(video[:,0], video[:,1])
+f_y = interpolate.interp1d(video[:,0], video[:,2])
+f_z = interpolate.interp1d(video[:,0], video[:,3])
+video = np.vstack((acc0[:,0], f_x(acc0[:,0]), f_y(acc0[:,0]), f_z(acc0[:,0]))).T
 
-acc0 = pre.addDrift(acc0, 5)
-
-# Smooth accelerometer data ready for sub sampling.
+# Smooth accelerometer data.
 acc0[:,1] = np.convolve(acc0[:,1], np.ones((size_of_kernel,))/size_of_kernel, mode='same')
 acc0[:,2] = np.convolve(acc0[:,2], np.ones((size_of_kernel,))/size_of_kernel, mode='same')
 acc0[:,3] = np.convolve(acc0[:,3], np.ones((size_of_kernel,))/size_of_kernel, mode='same')
-
-# Subsample accelerometer data to account for higher frequency.
-acc0 = pre.subsample(acc0, video)
-
-if acc0.shape[0] == video.shape[0]:
-    print("Smoothed and subsampled accelerometer data...")
 
 # Zero centre data.
 means = np.mean(acc0, axis=0)
@@ -104,26 +103,41 @@ video[:,3] = video[:,3]-means[3]
 X = 1
 Y = 2
 Z = 3
+component = Y
+acceleration = np.vstack((acc0[:,0], acc0[:,component])).T
+x_pos = np.vstack((video[:,0], video[:,component])).T
 
-comp = Y
 
-a = acc0[:,comp]
-v = video[:,comp]
-na = (a - np.mean(a)) / np.std(a)
-nv = (v - np.mean(v)) /  np.std(v)
 
-print 'max( np.correlate(na, nv, "same") ) =\t', max( np.absolute(np.correlate(na, nv, "same")) )
-print 'max( np.correlate(a, v, "same") ) =\t', max( np.absolute(np.correlate(a, v, "same")) )
+# acceleration = temporal_distortion.constant(acceleration, 0.5)
+acceleration = temporal_distortion.linear(acceleration, 0.1)
+# acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
+# acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
 
-# Plot the data:
-plt.title('Timeframe:' + pre.getTime(start_time) + ' - ' + pre.getTime(end_time))
-plt.xlabel('time')
-line1, = plt.plot(acc0[:,0], na, 'r', label="Accelerometer")
-line2, = plt.plot(video[:,0], nv, 'b', label="Video")
-plt.gca().twinx()
-line3, = plt.plot(video[:,0], np.correlate(na, nv, "same"), 'g', linewidth=2, label="x-corr")
-plt.legend([line1, line2, line3],["Accelerometer", "Video", "x-corr"])
+cross_corr, norm_cross_corr = f.x_corr(x_pos[:,1], acceleration[:,1])
+
+_, plotnum = plt.subplots(3, sharex=True)
+
+winSize = 2000
+stepSize = 2000
+
+# correct_times is a function of the incorrect drifted times.
+# correct_times = f(incorrect times)
+f = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plotnum[1])
+
+new_times = f(acceleration[:,0])
+
+plotnum[0].set_title("Original Data with triangular distortion.")
+plotnum[0].plot(x_pos[:,0], x_pos[:,1])
+plotnum[0].plot(acceleration[:,0], acceleration[:,1])
+plotnum[0].legend(['calculated acceleration', 'accelerometer'])
+
+string = "Sliding X-Corr with window size %1.1fs and step size %1.1f" % (winSize, stepSize)
+plotnum[1].set_title(string)
+
+plotnum[2].set_title("Fixed Data")
+plotnum[2].plot(x_pos[:,0], x_pos[:,1])
+plotnum[2].plot(new_times, acceleration[:,1])
+plotnum[2].legend(['calculated acceleration', 'accelerometer'])
+plt.xlabel("time")
 plt.show()
-
-# TODO Introduce a drift & fix.
-# TODO How do we select that window - the more movement the higher chance of there being correlation? Plot a function or use a ML classifier?

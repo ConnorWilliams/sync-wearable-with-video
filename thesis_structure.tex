@@ -1,0 +1,112 @@
+% \documentclass[options]{class}
+% CLASSES:
+% article     for articles in scientific journals, presentations, short reports, program documentation, invitations.
+% proc        for proceedings, based on the article class.
+% minimal     only sets a page size and a base font. It is mainly used for debugging purposes.
+% report      for longer reports containing several chapters, small books, PhD theses.
+% book        for real books
+% slides      for slides. The class uses big sans serif letters. You might want to consider using the Beamer class instead.
+
+\documentclass{article}
+% Preamble
+% \usepackage[options]{package}
+\usepackage{graphicx}
+\graphicspath{ {../} }
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{wrapfig}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
+
+\begin{document}
+\title{Thesis Structure}
+\author{Connor Williams - cw13121}
+\date{}
+\maketitle
+
+Dan Page kindly provided a LaTeX template for writing a thesis. The following structure is based on Dan's template with my own bits added in.
+
+None of the chapters are currently fully complete but I have made a good start on Contextual Background, Technical Background and Project Execution. Chapters and sections marked with (TODO) have not been started yet.
+
+I need to do some 'torture testing' on my algorithm and describe under what conditions it starts to fall down. I also still need to test on the SPHERE data which I will do this weekend.
+
+\section{Front Matter}
+\subsection{Abstract}
+\subsection{Supporting Technologies}
+\subsection{Notation and Acronyms}
+\subsection{Acknowledgements}
+
+\section{Main Matter}
+\subsection{Contextual Background}
+\begin{itemize}
+\item A high-level description of the project context to motivate each aim and objective.
+\item Introduction to SPHERE: what it is, what the long term aims are, how the technology could help.
+\item What the problem is: "Within the SPHERE group there is an accelerometer..."
+\item Short description of the accelerometer.
+\item Short description of the RGB-D cameras.
+\item What the current solution is.
+\item High level objective of the project.
+\item A brief breakdown of the project (4 or 5 bullet points).
+\item Benefits if the project is successful.
+\end{itemize}
+  
+
+
+\subsection{Technical Background}
+\begin{itemize}
+\item Proposed solution 1 - Synchronize two device clocks using algorithms such as Cristian's algorithm, Berkeley algorithm or NTP. Explain why these are no suitable (i.e. no network connectivity)
+\item Proposed solution 2 - Synchronise the signals along the time axis.
+    \begin{itemize}
+    \item Cite some papers on how people have done this before.
+    \item Show I can derive acceleration from position: f(x) = position, f'(x) = velocity, f''(x) = acceleration.
+    \item How do you track a drift?
+    \item What does 'drift'/ 'temporal distortion' even mean?
+    \item Define types of temporal distortion we will be working with.
+    \item Introduce cross correlation and explain why it wont work 'out of the box'.
+    \item Introduce the idea of a sliding window cross correlation.
+    \end{itemize}    
+\end{itemize}
+
+
+\subsection{Project Execution}
+\begin{itemize}
+\item Highlight best practice such as the fact I used version control, this blog.
+\item Talk about why I chose Python and SciPy.
+\item Description in chronological order of how the project started out: obtained clean SPHERE data, visualised it, did some processing, decided it was too noisy and complex.
+\item Decided to generate my own data.
+\item Describe my data generator, the features it has and why, different parameters users can change.
+\item Explain how this data made it easier to solve the task at hand.
+\item Describe the process from this synthetic data and the plots I used to eventually be successful in correcting for the different time drifts.
+\item Pseudo-code for the algorithm.
+\item Show the algorithm working for different time drifts on synthetic data.
+\item Show how the algorithm performs when I add temporal distortions to the clean SPHERE data (TO DO).
+\end{itemize}
+
+
+\subsection{Critical Evaluation (TO DO)}
+\begin{itemize}
+\item Describe exactly what can my algorithm do? (Show extreme cases of it working)
+\item Explain if it can it do more than/ less than/ exactly what we originally aimed for?
+\item Highlight the limitations of the algorithm and describe the conditions where it fails.
+\item Talk about assumptions I have made. (e.g. data is synchronised at t=0)
+\item Describe the parameters that a user can change and what they affect: window size, step size, length of signal to use.
+\item Evaluate how the algorithm works on the SPHERE data.
+\item Describe how it could be made better.
+\end{itemize}
+  
+
+
+\subsection{Conclusion and Further Work (TO DO)}
+\begin{itemize}
+\item (Re)summarise the main contributions and achievements, summing up the content.
+\item Clearly state the current project status e.g. 'I have an algorithm which can correct for these types of drift which could help/ has helped us discover X about the SPHERE data'.
+\item Evaluate what has been achieved with respect to the initial aims and objectives e.g. 'I completed aim X outlined previously, the evidence for this is within
+    Chapter Y'. Also include that I did not get as far as initially planned in fixing the accelerometer problem due to finding so many complications.
+\item Outline any open problems or future plans such as this algorithm could be used in SPHERE to reject false positive skeletons found by the RGB-D cameras etc.
+\item What I could have done given more time.
+\end{itemize}
+  
+
+
+\end{document}
