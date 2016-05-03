@@ -38,7 +38,7 @@ def getVel_Acc(pos_signal):
 
 
 def extract_section(whole, start_time, end_time):
-    partial = whole[whole[:,0]>start_time, :]
+    partial = whole[whole[:,0]>=start_time, :]
     partial = partial[partial[:,0]<end_time, :]
     return partial
 
@@ -46,47 +46,35 @@ def extract_section(whole, start_time, end_time):
 def sliding_xcorr(v, a, windowSize, step, sub_plot):
     maxTime = max(v[-1,0], a[-1,0])
     minTime = min(v[0, 0], a[0, 0])
-    sub_plot.plot()
-
-
     # Do the work
     window_lag = 0
     lags = [0]
     true_times = [0]
     for windowStart in np.arange(minTime, maxTime-windowSize, step):
         windowEnd = windowStart + windowSize
-        print windowStart, windowEnd
         pv = extract_section(v, windowStart, windowEnd)
         # Plus the previous window lag so we get the DATA we want. It will be shifted along a bit.
         pa = extract_section(a, windowStart+window_lag, windowEnd+window_lag)
-        # print pv
-        # raw_input("Press enter...")
-        # print pa
-        # raw_input("Press enter...")
         cross_corr, norm_cross_corr = x_corr(pv[:,1], pa[:,1])
         height = cross_corr.shape[0]
 
         x = np.ones(height)*(windowStart)                # Start of the window
         y = np.linspace(-windowSize, windowSize, height) # Every cross_corr value gets a point
-        n = cross_corr                                   # Color the points as a fxn of the cross_corr values
+        n = norm_cross_corr                              # Color the points as a fxn of the cross_corr values
 
         if (x.size!=y.size or y.size!=n.size or x.size!=n.size):
             error = "Error: Size Mismatch in sliding_xcorr; x.size=%.0f, y.size=%.0f, n.size=%.0f" %(x.size, y.size, n.size)
             print >>sys.stderr, error
             sys.exit()
 
-        window_lag += y[np.argmax(cross_corr)]
+        window_lag += y[np.argmax(n)]
         lags.append(window_lag)
         true_times.append(windowStart)
-        # print "Data from %.1f to %.1f is shifted by %fs. window_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(cross_corr)], window_lag)
+        print "Data from %.1f to %.1f is shifted by %f. \twindow_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(n)], window_lag)
         sub_plot.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
 
     wrong_times = np.array(true_times)+lags
     f_i = interpolate.interp1d(wrong_times, true_times, bounds_error=False)
-    # plt.figure()
-    # plt.plot(v[:,0], v[:,0])
-    # plt.plot(v[:,0], f_i(v[:,0]), "-o")
-    # plt.show()
     # sub_plot.plot(true_times, lags)
     return f_i
 

@@ -2,10 +2,8 @@ import numpy as np
 from scipy import interpolate
 import fxn_library as f
 from random import uniform
-
 from scipy import signal as signal_lib
 import matplotlib.pyplot as plt
-
 
 def rad(x): return x*(np.pi/180)
 
@@ -16,23 +14,22 @@ def constant(signal, shift):
     return signal
 
 
-def linear(signal, mult):
-    distortion = np.linspace(0, 8, signal.shape[0])
+def linear(signal, max_drift):
+    distortion = np.linspace(0, max_drift, signal.shape[0])
     new_signal = apply_distortion(signal, distortion)
     return new_signal
 
 
-def periodic(signal, min_mult, max_mult, sampling_rate):
+def periodic(signal, max_drift):
     # Create the distortion wave.
-    amplitude = (max_mult-min_mult)/2
-    y_intersept = (max_mult+min_mult)/2
-    frequency = 0.03
-    distortion = (amplitude*np.sin( rad(signal[:,0])*frequency*360 )) + y_intersept
+    amplitude = max_drift
+    frequency = 1/((signal[-1,0]-signal[0,0])/3)
+    distortion = (amplitude*np.sin( rad(signal[:,0])*frequency*360 ))
     new_signal = apply_distortion(signal, distortion)
     return new_signal
 
 
-def triangular(signal, min_mult, max_mult, sampling_rate):
+def triangular(signal, min_mult, max_mult):
     # Create the distortion wave.
     amplitude = (max_mult-min_mult)/2
     y_intersept = (max_mult+min_mult)/2
@@ -50,7 +47,6 @@ def apply_distortion(signal, distortion):
     new_y = f_i(signal[:,0])
 
     new_signal = np.vstack( (signal[:,0], new_y) ).T
-    new_signal = f.extract_section(new_signal, start_time, end_time)
 
     # plt.plot(signal[:,0], signal[:,1])
     # plt.plot(signal[:,0], distortion)

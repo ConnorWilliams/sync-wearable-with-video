@@ -29,8 +29,8 @@ def addTime(t, interval):
     return int(newTime)
 
 #---- VARIABLES (Change) ----#
-time_interval = 30000 #(milliseconds)
-start_time = 143419000
+time_interval = 23000 #(milliseconds)
+start_time = 143413000
 date_dir = "Rec_10_06_15_15_33_04_yangdi_1/"
 size_of_kernel = 15
 
@@ -89,55 +89,67 @@ acc0[:,1] = np.convolve(acc0[:,1], np.ones((size_of_kernel,))/size_of_kernel, mo
 acc0[:,2] = np.convolve(acc0[:,2], np.ones((size_of_kernel,))/size_of_kernel, mode='same')
 acc0[:,3] = np.convolve(acc0[:,3], np.ones((size_of_kernel,))/size_of_kernel, mode='same')
 
-# Zero centre data.
-means = np.mean(acc0, axis=0)
-acc0[:,1] = acc0[:,1]-means[1]
-acc0[:,2] = acc0[:,2]-means[2]
-acc0[:,3] = acc0[:,3]-means[3]
-means = np.mean(video, axis=0)
-video[:,1] = video[:,1]-means[1]
-video[:,2] = video[:,2]-means[2]
-video[:,3] = video[:,3]-means[3]
+# # Zero centre data.
+# means = np.mean(acc0, axis=0)
+# acc0[:,1] = acc0[:,1]-means[1]
+# acc0[:,2] = acc0[:,2]-means[2]
+# acc0[:,3] = acc0[:,3]-means[3]
+# means = np.mean(video, axis=0)
+# video[:,1] = video[:,1]-means[1]
+# video[:,2] = video[:,2]-means[2]
+# video[:,3] = video[:,3]-means[3]
 
 # Show data is correlated & clean.
 X = 1
 Y = 2
 Z = 3
-component = Y
+component = Z
 acceleration = np.vstack((acc0[:,0], acc0[:,component])).T
 x_pos = np.vstack((video[:,0], video[:,component])).T
 
+fig = plt.figure()
+
+plot1 = plt.subplot(411)
+plot1.set_title("Original Data")
+ln1 = plot1.plot(x_pos[:,0], x_pos[:,1], 'b', label="x_pos")
+ax2 = plot1.twinx()
+ln2 = ax2.plot(acceleration[:,0], acceleration[:,1], 'g', label="accelerometer")
+lines = ln1+ln2
+labels = [l.get_label() for l in lines]
+plot1.legend(lines, labels, loc=0)
 
 
-# acceleration = temporal_distortion.constant(acceleration, 0.5)
-acceleration = temporal_distortion.linear(acceleration, 0.1)
-# acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
-# acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
+# acceleration = temporal_distortion.constant(acceleration, 500)
+# acceleration = temporal_distortion.linear(acceleration, 2000)
+acceleration = temporal_distortion.periodic(acceleration, 500)
+# acceleration = temporal_distortion.triangular(acceleration, -1, 1)
 
-cross_corr, norm_cross_corr = f.x_corr(x_pos[:,1], acceleration[:,1])
-
-_, plotnum = plt.subplots(3, sharex=True)
+plot2 = plt.subplot(412)
+plot2.set_title("Distorted Data")
+ln1 = plot2.plot(x_pos[:,0], x_pos[:,1], 'b', label="x_pos")
+ax2 = plot2.twinx()
+ln2 = ax2.plot(acceleration[:,0], acceleration[:,1], 'g', label="accelerometer")
+lines = ln1+ln2
+labels = [l.get_label() for l in lines]
+plot2.legend(lines, labels, loc=0)
 
 winSize = 2000
-stepSize = 2000
+stepSize = 1000
 
 # correct_times is a function of the incorrect drifted times.
 # correct_times = f(incorrect times)
-f = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plotnum[1])
-
+plot3 = plt.subplot(413)
+plot3.set_title("Sliding X-Corr with window size %1.1f and step size %1.1f" % (winSize, stepSize))
+f = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plot3)
 new_times = f(acceleration[:,0])
 
-plotnum[0].set_title("Original Data with triangular distortion.")
-plotnum[0].plot(x_pos[:,0], x_pos[:,1])
-plotnum[0].plot(acceleration[:,0], acceleration[:,1])
-plotnum[0].legend(['calculated acceleration', 'accelerometer'])
-
-string = "Sliding X-Corr with window size %1.1fs and step size %1.1f" % (winSize, stepSize)
-plotnum[1].set_title(string)
-
-plotnum[2].set_title("Fixed Data")
-plotnum[2].plot(x_pos[:,0], x_pos[:,1])
-plotnum[2].plot(new_times, acceleration[:,1])
-plotnum[2].legend(['calculated acceleration', 'accelerometer'])
+plot4 = plt.subplot(414)
+plot4.set_title("Fixed Data")
+ln1 = plot4.plot(x_pos[:,0], x_pos[:,1], 'b', label="x_pos")
+ax2 = plot4.twinx()
+ln2 = ax2.plot(new_times, acceleration[:,1], 'g', label="accelerometer")
+lines = ln1+ln2
+labels = [l.get_label() for l in lines]
+plot4.legend(lines, labels, loc=0)
 plt.xlabel("time")
 plt.show()
