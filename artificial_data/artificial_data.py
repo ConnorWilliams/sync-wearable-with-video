@@ -11,7 +11,7 @@ x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
 # acceleration = temporal_distortion.constant(acceleration, 0.5)
-# acceleration = temporal_distortion.linear(acceleration, 0.1, sampling_rate)
+acceleration = temporal_distortion.linear(acceleration, 5, sampling_rate)
 # acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
 # acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
 

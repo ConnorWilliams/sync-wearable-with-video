@@ -87,6 +87,7 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
 def x_corr(v, a):
     nv = (v - np.mean(v)) /  np.std(v)
     na = (a - np.mean(a)) / (np.std(a) * (len(a)-1))
+    print v.shape, a.shape
     cross_corr = signal.correlate(a, v, "full")
     norm_cross_corr = signal.correlate(na, nv, "full")
     return cross_corr, norm_cross_corr

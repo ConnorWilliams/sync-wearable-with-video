@@ -24,17 +24,16 @@ def periodic(signal, max_drift):
     # Create the distortion wave.
     amplitude = max_drift
     frequency = 1/((signal[-1,0]-signal[0,0])/3)
-    distortion = (amplitude*np.sin( rad(signal[:,0])*frequency*360 ))
+    distortion = (amplitude*np.sin( (rad(signal[:,0]-signal[0,0])*frequency*360) ))
     new_signal = apply_distortion(signal, distortion)
     return new_signal
 
 
-def triangular(signal, min_mult, max_mult):
+def triangular(signal, max_drift):
     # Create the distortion wave.
-    amplitude = (max_mult-min_mult)/2
-    y_intersept = (max_mult+min_mult)/2
-    period = 20
-    distortion = amplitude*signal_lib.sawtooth(signal[:,0]/(period/(2*np.pi)), 0.5) + y_intersept
+    amplitude = max_drift
+    period = signal[-1,0]-signal[0,0]/3
+    distortion = amplitude*signal_lib.sawtooth(signal[:,0]/(period/(2*np.pi)), 0.5)
     new_signal = apply_distortion(signal, distortion)
     return new_signal
 

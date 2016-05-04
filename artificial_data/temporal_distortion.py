@@ -16,8 +16,8 @@ def constant(signal, shift):
     return signal
 
 
-def linear(signal, mult, sampling_rate):
-    distortion = signal[:,0]*mult
+def linear(signal, max_drift, sampling_rate):
+    distortion = np.linspace(0, max_drift, signal.shape[0])
     new_signal = apply_distortion(signal, distortion)
     return new_signal
 

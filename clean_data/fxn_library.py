@@ -10,24 +10,9 @@ from sklearn.preprocessing import scale
 import seaborn as sns
 import itertools
 
+import pre_processing as pre
+
 np.set_printoptions(threshold=np.nan)
-
-
-def generateData(noise, seconds, amplitude, frequency, sampling_rate):
-    add_noise = noise
-    time = np.arange(0, seconds, 1.0/sampling_rate)
-    x_pos = amplitude * np.sin( rad(time)*frequency*360 )
-
-    if add_noise == True:
-        x_pos = x_pos + np.random.normal(0, 0.001, x_pos.size)
-
-    acceleration = np.gradient(np.gradient(x_pos))
-    x_pos = np.vstack((time, x_pos)).T
-    acceleration = np.vstack((time, acceleration)).T
-    return x_pos, acceleration
-
-def rad(x): return x*(np.pi/180)
-
 
 def getVel_Acc(pos_signal):
     x_vel = np.gradient(pos_signal[:,1])
@@ -46,21 +31,22 @@ def extract_section(whole, start_time, end_time):
 def sliding_xcorr(v, a, windowSize, step, sub_plot):
     maxTime = max(v[-1,0], a[-1,0])
     minTime = min(v[0, 0], a[0, 0])
-    # Do the work
+
     window_lag = 0
     lags = [0]
     true_times = [0]
-    for windowStart in np.arange(minTime, maxTime-windowSize, step):
+    for i, windowStart in enumerate(np.arange(minTime, maxTime-windowSize, step)):
         windowEnd = windowStart + windowSize
         pv = extract_section(v, windowStart, windowEnd)
-        # Plus the previous window lag so we get the DATA we want. It will be shifted along a bit.
+        ## Plus the previous window lag so we get the DATA we want. It will be shifted along a bit.
         pa = extract_section(a, windowStart+window_lag, windowEnd+window_lag)
+        if windowEnd+window_lag > a[-1,0]: break
         cross_corr, norm_cross_corr = x_corr(pv[:,1], pa[:,1])
         height = cross_corr.shape[0]
 
-        x = np.ones(height)*(windowStart)                # Start of the window
-        y = np.linspace(-windowSize, windowSize, height) # Every cross_corr value gets a point
-        n = norm_cross_corr                              # Color the points as a fxn of the cross_corr values
+        x = np.ones(height)*(windowStart)                ## Start of the window
+        y = np.linspace(-windowSize, windowSize, height) ## Every cross_corr value gets a point
+        n = norm_cross_corr                              ## Color the points as a fxn of the cross_corr values
 
         if (x.size!=y.size or y.size!=n.size or x.size!=n.size):
             error = "Error: Size Mismatch in sliding_xcorr; x.size=%.0f, y.size=%.0f, n.size=%.0f" %(x.size, y.size, n.size)
@@ -70,7 +56,7 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
         window_lag += y[np.argmax(n)]
         lags.append(window_lag)
         true_times.append(windowStart)
-        print "Data from %.1f to %.1f is shifted by %f. \twindow_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(n)], window_lag)
+        # print "Data from %.1f to %.1f is shifted by %f. \twindow_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(n)], window_lag)
         sub_plot.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
 
     wrong_times = np.array(true_times)+lags
