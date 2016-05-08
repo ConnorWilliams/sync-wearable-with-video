@@ -2,6 +2,7 @@ import numpy as np
 from scipy import interpolate
 from scipy import signal
 from scipy import array
+from scipy import integrate
 import matplotlib.pyplot as plt
 import sys
 from matplotlib.collections import LineCollection
@@ -20,6 +21,16 @@ def getVel_Acc(pos_signal):
     pos_signal = np.hstack((pos_signal, x_vel[:,None]))
     pos_signal = np.hstack((pos_signal, x_acc[:,None]))
     return pos_signal
+
+def getVel_Pos(acc_signal):
+    times = acc_signal[:,0]
+    x_acc = acc_signal[:,1]
+    x_vel = integrate.cumtrapz(acc_signal[:,1], x=times, initial=0)
+    x_pos = integrate.cumtrapz(x_vel, x=times, initial=0)
+    acc_signal = np.vstack((times, x_pos)).T
+    # acc_signal = np.vstack((acc_signal, x_vel)).T
+    # acc_signal = np.vstack((acc_signal, x_acc)).T
+    return acc_signal
 
 
 def extract_section(whole, start_time, end_time):
@@ -53,7 +64,15 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
             print >>sys.stderr, error
             sys.exit()
 
-        window_lag += y[np.argmax(n)]
+        # To make it monotonically increasing:
+        # windowStart+lags[-1]+y[np.argmax(np.abs(n))] >= windowStart-step+lags[-1]
+        # windowStart+y[np.argmax(np.abs(n))] >= windowStart-step
+        # y[np.argmax(np.abs(n))] >= -step
+        # y[np.argmax(np.abs(n))]+step >= 0
+        yzz = y[y+step>0]
+        nzz = n[y+step>0]
+        # window_lag += yzz[np.argmax(np.abs(nzz))]
+        window_lag += yzz[np.argmax(nzz)]
         lags.append(window_lag)
         true_times.append(windowStart)
         # print "Data from %.1f to %.1f is shifted by %f. \twindow_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(n)], window_lag)

@@ -51,10 +51,10 @@ x_pos = np.vstack((video[:,0], video[:,component])).T
 acceleration = np.copy(original_acceleration)
 
 ## Distort the data
+# acceleration = temporal_distortion.linear(acceleration, 1000)
+# acceleration = temporal_distortion.periodic(acceleration, 1000)
+# acceleration = temporal_distortion.triangular(acceleration, 600)
 # acceleration = temporal_distortion.constant(acceleration, 500)
-acceleration = temporal_distortion.linear(acceleration, 1000)
-# acceleration = temporal_distortion.periodic(acceleration, 500)
-# acceleration = temporal_distortion.triangular(acceleration, 300)
 
 plt.figure(1)
 ## Plot the distorted data
@@ -79,15 +79,16 @@ plot3 = plt.subplot(312)
 plot3.set_title("Sliding X-Corr with window size %1.1f and step size %1.1f" % (winSize, stepSize))
 f = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plot3)
 
-plt.figure(2)
-ln1 = plt.plot((video[0,0],video[-1,0]),(video[0,0],video[-1,0]), 'b', alpha=0.5, label="Ideal time mapping function")
-ln2 =plt.plot(acceleration[:,0], f(acceleration[:,0]), 'r', label="Time mapping function")
-lines = ln1+ln2
-labels = [l.get_label() for l in lines]
-plt.title("Time mapping functions")
-plt.xlabel("Drifted times")
-plt.ylabel("Fixed times")
-plt.legend(lines, labels, loc=0)
+# # Uncomment to plot the time mapping function.
+# plt.figure(2)
+# ln1 = plt.plot((video[0,0],video[-1,0]),(video[0,0],video[-1,0]), 'b', alpha=0.5, label="Ideal time mapping function")
+# ln2 =plt.plot(acceleration[:,0], f(acceleration[:,0]), 'r', label="Time mapping function")
+# lines = ln1+ln2
+# labels = [l.get_label() for l in lines]
+# plt.title("Time mapping functions")
+# plt.xlabel("Drifted times")
+# plt.ylabel("Fixed times")
+# plt.legend(lines, labels, loc=0)
 
 new_times = f(acceleration[:,0])
 

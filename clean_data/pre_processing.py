@@ -42,6 +42,7 @@ def pre_process(joint_num, start_time, time_interval, ts_info, video, acc0, acc1
     f_z = interpolate.interp1d(video[:,0], video[:,3])
     video = np.vstack((acc0[:,0], f_x(acc0[:,0]), f_y(acc0[:,0]), f_z(acc0[:,0]))).T
 
+    # Minus mean and divide by std deviation
     from sklearn.preprocessing import StandardScaler
     accel_norm = StandardScaler()
     acc0[:, 1:] = accel_norm.fit_transform(acc0[:, 1:])
@@ -49,9 +50,10 @@ def pre_process(joint_num, start_time, time_interval, ts_info, video, acc0, acc1
     video[:, 1:] = video_norm.fit_transform(video[:, 1:])
 
     ## Smooth accelerometer data.
-    acc0[:,1] = np.convolve(acc0[:,1], np.ones((15))/15, mode='same')
-    acc0[:,2] = np.convolve(acc0[:,2], np.ones((15))/15, mode='same')
-    acc0[:,3] = np.convolve(acc0[:,3], np.ones((15))/15, mode='same')
+    kernelSize = 15
+    acc0[:,1] = np.convolve(acc0[:,1], np.ones((kernelSize))/kernelSize, mode='same')
+    acc0[:,2] = np.convolve(acc0[:,2], np.ones((kernelSize))/kernelSize, mode='same')
+    acc0[:,3] = np.convolve(acc0[:,3], np.ones((kernelSize))/kernelSize, mode='same')
     return video, acc0, acc1
 
 
