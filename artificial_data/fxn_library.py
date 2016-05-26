@@ -14,16 +14,16 @@ np.set_printoptions(threshold=np.nan)
 
 
 def generateData(noise, seconds, amplitude, frequency, sampling_rate):
-    add_noise = noise
     time = np.arange(0, seconds, 1.0/sampling_rate)
     x_pos = amplitude * np.sin( rad(time)*frequency*360 )
 
-    if add_noise == True:
-        x_pos = x_pos + np.random.normal(0, 0.001, x_pos.size)
 
     acceleration = np.gradient(np.gradient(x_pos))
     x_pos = np.vstack((time, x_pos)).T
     acceleration = np.vstack((time, acceleration)).T
+
+    x_pos[:,1] = x_pos[:,1] + np.random.normal(0, noise, x_pos[:,1].size)
+    acceleration[:,1] = acceleration[:,1] + np.random.normal(0, noise, acceleration[:,1].size)
     return x_pos, acceleration
 
 def rad(x): return x*(np.pi/180)
@@ -43,10 +43,10 @@ def extract_section(whole, start_time, end_time):
     return partial
 
 
-def sliding_xcorr(v, a, windowSize, step, sub_plot):
+def sliding_xcorr(v, a, windowSize, step, plotNum):
     maxTime = max( max(v[:,0]), max(a[:,0]) )
     minTime = min( min(v[:,0]), min(a[:,0]) )
-    sub_plot.plot()
+    plt.plot()
 
     # Do the work
     window_lag = 0
@@ -73,7 +73,7 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
         lags.append(window_lag)
         true_times.append(windowStart)
         # print "Data from %.1f to %.1f is shifted by %fs. window_lag = %.5f" %(windowStart, windowEnd, y[np.argmax(cross_corr)], window_lag)
-        sub_plot.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
+        plotNum.scatter(x, y, marker=",", lw=0, c=n, cmap="RdBu_r")
 
     wrong_times = np.array(true_times)+lags
     f_i = interpolate.interp1d(wrong_times, true_times, bounds_error=False)
@@ -87,7 +87,6 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
 def x_corr(v, a):
     nv = (v - np.mean(v)) /  np.std(v)
     na = (a - np.mean(a)) / (np.std(a) * (len(a)-1))
-    print v.shape, a.shape
     cross_corr = signal.correlate(a, v, "full")
     norm_cross_corr = signal.correlate(na, nv, "full")
     return cross_corr, norm_cross_corr

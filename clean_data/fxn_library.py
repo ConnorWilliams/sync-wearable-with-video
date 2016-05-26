@@ -71,7 +71,6 @@ def sliding_xcorr(v, a, windowSize, step, sub_plot):
         # y[np.argmax(np.abs(n))]+step >= 0
         yzz = y[y+step>0]
         nzz = n[y+step>0]
-        # window_lag += yzz[np.argmax(np.abs(nzz))]
         window_lag += yzz[np.argmax(nzz)]
         lags.append(window_lag)
         true_times.append(windowStart)

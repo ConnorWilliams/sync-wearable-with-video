@@ -7,20 +7,20 @@ start_time = 0
 end_time = 100
 sampling_rate = 50
 
-x_pos, acceleration = f.generateData(False, end_time, 200, 0.5, sampling_rate)
+x_pos, acceleration = f.generateData(0.00001, end_time, 200, 0.2, sampling_rate)
 
 x_pos = f.getVel_Acc(x_pos)
 # acceleration = temporal_distortion.constant(acceleration, 0.5)
-acceleration = temporal_distortion.linear(acceleration, 5, sampling_rate)
-# acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
+# acceleration = temporal_distortion.linear(acceleration, 2, sampling_rate)
+acceleration = temporal_distortion.periodic(acceleration, -1, 1, sampling_rate)
 # acceleration = temporal_distortion.triangular(acceleration, -1, 1, sampling_rate)
 
 cross_corr, norm_cross_corr = f.x_corr(x_pos[:,3], acceleration[:,1])
 
 _, plotnum = plt.subplots(3, sharex=True)
 
-winSize = 1
-stepSize = 0.5
+winSize = 3
+stepSize = 1
 
 # correct_times is a function of the incorrect drifted times.
 # correct_times = f(incorrect times)
