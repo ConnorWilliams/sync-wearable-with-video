@@ -10,8 +10,9 @@ def rad(x): return x*(np.pi/180)
 
 def constant(signal, shift):
     distortion = np.ones(signal.shape[0])*shift
-    signal[:,0] += distortion
-    return signal
+    distortion[0] = 0
+    new_signal = apply_distortion(signal, distortion)
+    return new_signal
 
 
 def linear(signal, max_drift):

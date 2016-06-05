@@ -16,14 +16,18 @@ np.set_printoptions(threshold=np.nan)
 def generateData(noise, seconds, amplitude, frequency, sampling_rate):
     time = np.arange(0, seconds, 1.0/sampling_rate)
     x_pos = amplitude * np.sin( rad(time)*frequency*360 )
+    # x_pos[:,1] = x_pos[:,1] + np.random.normal(0, noise, x_pos[:,1].size)
 
-
-    acceleration = np.gradient(np.gradient(x_pos))
+    # acceleration = np.gradient(np.gradient(x_pos))
+    # acceleration = (np.gradient(x_pos))
+    acceleration = x_pos
+    plt.plot(time, x_pos[:,1], 'b')
+    plt.gca().twinx()
+    plt.plot(time, acceleration[:,1], 'r')
+    plt.show()
+    exit()
     x_pos = np.vstack((time, x_pos)).T
     acceleration = np.vstack((time, acceleration)).T
-
-    x_pos[:,1] = x_pos[:,1] + np.random.normal(0, noise, x_pos[:,1].size)
-    acceleration[:,1] = acceleration[:,1] + np.random.normal(0, noise, acceleration[:,1].size)
     return x_pos, acceleration
 
 def rad(x): return x*(np.pi/180)
@@ -57,7 +61,7 @@ def sliding_xcorr(v, a, windowSize, step, plotNum):
         pv = extract_section(v, windowStart, windowEnd)
         # Plus the previous window lag so we get the DATA we want. It will be shifted along a bit.
         pa = extract_section(a, windowStart+window_lag, windowEnd+window_lag)
-        cross_corr, norm_cross_corr = x_corr(pv[:,3], pa[:,1])
+        cross_corr, norm_cross_corr = x_corr(pv[:,1], pa[:,1])
         height = cross_corr.shape[0]
 
         x = np.ones(height)*(windowStart)                # Start of the window

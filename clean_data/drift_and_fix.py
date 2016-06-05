@@ -37,30 +37,30 @@ ts_info_names = ("imName", "idxColour", "tsColour", "idxDepth", "tsDepth", "diff
 video_names = ()
 acc_names = ("idx", "diff", "tsRecDvc", "AccX", "AccY", "AccZ", "tsInternal")
 
-
 if (len(sys.argv)!=6):
     print("Please give arguments: int joint_number, int component, int windowSize, int stepSize, bool plot")
     exit()
 
 joint_number = int(sys.argv[1])
 component = int(sys.argv[2])
-windowSize = float(sys.argv[3])
-stepSize = int(sys.argv[4])
+omega = float(sys.argv[3])
+eta = int(sys.argv[4])
 plot = sys.argv[5]
+mse_fixed_total = 0
 
 for segment in segments:
     date_dir = segment[0]
     start_time = segment[1]
     time_interval = segment[2]
-    period = segment[3]
-    winSize = int(round(period*windowSize, -2))
+    tau = segment[3]
+    winSize = int(round(omega*tau, -2))
+    stepSize = int(round(winSize*eta, -2))
 
     ts_info_filename = date_dir + dev_dir + 'frameTSinfo0.000000.txt'
     acc0_filename = date_dir + acc0_dir + 'ACC_0.000000.txt'
     acc1_filename = date_dir + acc1_dir + 'ACC_1.000000.txt'
     video_filename = date_dir + dev_dir + 'user1.txt'
 
-    mse_fixed_total = 0
 
     #---- START COMPUTATION ----#
     ## Read in and pre_process the data
@@ -76,26 +76,23 @@ for segment in segments:
     video[:,0] -= video[0,0]
     acc0[:,0] -= acc0[0,0]
 
-    ## Extract that component
-    original_acceleration = np.vstack((acc0[:,0], acc0[:,component])).T
-    x_pos = np.vstack((video[:,0], video[:,component])).T
+    ## Extract the component
+    a = np.vstack((acc0[:,0], acc0[:,component])).T
+    v = np.vstack((video[:,0], video[:,component])).T
 
-    acceleration = np.copy(original_acceleration)
 
-    ## Distort the data
-    # acceleration = temporal_distortion.linear(acceleration, period)
-    # acceleration = temporal_distortion.periodic(acceleration, int(round(period/5, -2)))
-    acceleration = temporal_distortion.triangular(acceleration, int(round(period/5, -2)))
-    # acceleration = temporal_distortion.constant(acceleration, period)
-
-    mse_drift = ((original_acceleration[:,1] - acceleration[:,1])**2).mean(axis=0)
+    a_d = np.copy(a)
+    ## Distort the accelerometer data
+    a_d = temporal_distortion.linear(a_d, tau)
+    # a_d = temporal_distortion.periodic(a_d, int(round(tau/5, -2)))
+    # a_d = temporal_distortion.triangular(a_d, int(round(tau/5, -2)))
+    # a_d = temporal_distortion.constant(a_d, tau)
 
     ## correct_times is a function of the incorrect drifted times.
-    ## correct_times = f(incorrect times)
     plot3 = plt.subplot(312)
     plot3.set_title("Sliding X-Corr with window size %1.1f and step size %1.1f" % (winSize, stepSize))
-    f_t = f.sliding_xcorr(x_pos, acceleration, winSize, stepSize, plot3)
-
+    f_t = f.sliding_xcorr(v, a_d, winSize, stepSize, plot3)
+    new_times = f_t(a_d[:,0])
 
     # # Uncomment to plot the time mapping function.
     # plt.figure(2)
@@ -108,31 +105,32 @@ for segment in segments:
     # plt.ylabel("Fixed times")
     # plt.legend(lines, labels, loc=0)
 
-    new_times = f_t(acceleration[:,0])
+    # Create the fixed signal a_f
+    f_n = interpolate.interp1d(new_times, a_d[:,1], bounds_error=False)
+    a_f = np.vstack((v[:,0], f_i(v[:,0]))).T
 
-    f_i = interpolate.interp1d(new_times, acceleration[:,1], bounds_error=False)
-    fixed_acceleration = np.vstack((x_pos[:,0], f_i(x_pos[:,0]))).T
 
-    x_pos =  x_pos[np.logical_not(np.isnan(fixed_acceleration[:,1]))]
-    original_acceleration =  original_acceleration[np.logical_not(np.isnan(fixed_acceleration[:,1]))]
-    acceleration =  acceleration[np.logical_not(np.isnan(fixed_acceleration[:,1]))]
-    new_times = new_times[np.logical_not(np.isnan(fixed_acceleration[:,1]))]
-    fixed_acceleration =  fixed_acceleration[np.logical_not(np.isnan(fixed_acceleration[:,1]))]
 
-    mse_fixed = ((original_acceleration[:,1] - fixed_acceleration[:,1])**2).mean(axis=0)
-    mse_fixed_total += mse_fixed
-    print "MSE between ground truth and drifted is %f" %(mse_drift)
-    print "MSE between ground truth and fixed is %f\n" %(mse_fixed)
+    v   =  v[np.logical_not(np.isnan(a_f[:,1]))]
+    a   =  a[np.logical_not(np.isnan(a_f[:,1]))]
+    a_d =  a_d[np.logical_not(np.isnan(a_f[:,1]))]
+    a_f =  a_f[np.logical_not(np.isnan(a_f[:,1]))]
+
+    mse_drifted = ((a[:,1]-a_d[:,1])**2).mean(axis=0)
+    mse_fixed = ((a[:,1]-a_f[:,1])**2).mean(axis=0)
+    P = mse_fixed/mse_drifted
+    print "MSE(a, a_d)=%f\n" %(mse_drifted)
+    print "MSE(a, a_f)=%f\n" %(mse_fixed)
+    print "P=%f\n" %(P)
 
     ## Plot the distorted data
     plt.figure(1)
     plot2 = plt.subplot(211)
     plot2.set_title("Original Data vs Distorted Data")
-    ln1 = plot2.plot(x_pos[:,0], x_pos[:,1], 'b', label="position", alpha=0.2)
-    ax2 = plot2.twinx()
-    ln2 = plot2.plot(original_acceleration[:,0], original_acceleration[:,1], 'g', label="original accelerometer data")
-    ln3 = plot2.plot(acceleration[:,0], acceleration[:,1], 'r', label="distorted accelerometer data", alpha=0.5)
-    lines = ln2+ln3
+    ln1 = plot2.plot(v[:,0], v[:,1], 'b', label="position", alpha=0.1)
+    ln2 = plot2.plot(a[:,0], a[:,1], 'g', label="original accelerometer data", alpha=0.6)
+    ln3 = plot2.plot(a_d[:,0], a_d[:,1], 'r', label="distorted accelerometer data", alpha=0.8)
+    lines = ln1+ln2+ln3
     labels = [l.get_label() for l in lines]
     plot2.legend(lines, labels, loc=2)
 
@@ -142,18 +140,15 @@ for segment in segments:
         %(date_dir, start_time, end_time, joints[joint_number], mse_drift, mse_fixed) )
     plot1 = plt.subplot(212)
     plot1.set_title("Original Data vs Fixed Data")
-    ln1 = plot1.plot(x_pos[:,0], x_pos[:,1], 'b', label="position", alpha=0.2)
-    ax2 = plot1.twinx()
-    ln2 = plot1.plot(original_acceleration[:,0], original_acceleration[:,1], 'g', label="original accelerometer data")
-    ln3 = plot1.plot(fixed_acceleration[:,0], fixed_acceleration[:,1], 'r', label="fixed accelerometer data")
+    ln1 = plot1.plot(v[:,0], v[:,1], 'b', label="position", alpha=0.1)
+    ln2 = plot1.plot(a[:,0], a[:,1], 'g', label="original accelerometer data", alpha=0.6)
+    ln3 = plot1.plot(a_f[:,0], a_f[:,1], 'r', label="fixed accelerometer data", alpha=0.8)
     lines = ln1+ln2+ln3
     labels = [l.get_label() for l in lines]
     plot1.legend(lines, labels, loc=2)
 
-    plot1.set_xlim([-100, acceleration[-1,0]])
-    plot2.set_xlim([-100, acceleration[-1,0]])
-    plot3.set_xlim([-100, acceleration[-1,0]])
+    plot1.set_xlim([-100, a[-1,0]])
+    plot2.set_xlim([-100, a[-1,0]])
+    plot3.set_xlim([-100, a[-1,0]])
 
     if plot=="True": plt.show()
-
-print "Average MSE %f\n" %(mse_fixed_total/len(segments) )
